@@ -1,0 +1,75 @@
+#include<iostream>
+#include<vector>
+#define ll long long
+
+using namespace std;
+
+class SegmentTree{
+   vector<ll> tree;
+   ll n;
+   public: 
+      SegmentTree(ll n){
+            this->n = n;
+            tree.resize(4*n+1);
+      }
+      void build(vector<ll>& arr,ll start,ll end,ll index){  //tc->o(n);
+          if(start == end){
+            tree[index] = arr[start];
+            return;
+          }
+          ll mid = (start+end)/2;
+
+          ll left = 2*index;
+          ll right = 2*index+1;
+
+          build(arr,start,mid,2*index);
+          build(arr,mid+1,end,2*index+1);
+
+          tree[index] = tree[left]+tree[right];
+      }
+      void update(vector<ll>& arr,ll start,ll end,ll index,ll pos,ll val){ //tc->o(logn)
+          if(start == end){
+            arr[pos] = val;
+            tree[index] = val;
+            return;
+          }
+          ll mid = (start+end)/2;
+          if(mid>=pos){
+            update(arr,start,mid,2*index,pos,val);
+          }
+          else{
+            update(arr,mid+1,end,2*index+1,pos,val);
+          }
+          tree[index] = tree[2*index]+tree[2*index+1];
+      }
+      ll query(ll start,ll end,ll index,ll l,ll r){ //tc->o(4*logn)
+            if(l<=start && end<=r){
+                return tree[index];
+            }
+
+            if(l>end || r<start){
+                return 0;
+            }
+
+            ll mid = (start+end)/2;
+
+            ll leftans = query(start,mid,2*index,l,r);
+            ll rightans = query(mid+1,end,2*index+1,l,r);
+
+            return leftans+rightans;
+      }
+};
+
+int main(){
+    ll n;
+    cin>>n;
+    vector<ll> arr(n);
+
+    for(int i=0;i<n;i++){
+        cin>>arr[i];
+    }
+
+    SegmentTree s(n);
+
+    s.build(arr,0,n-1,1);
+}
