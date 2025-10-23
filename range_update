@@ -1,0 +1,35 @@
+      void push(ll ind,ll st,ll en){
+          tree[ind].first += lazy[ind];
+          tree[ind].second += lazy[ind];
+
+          if(st != en){
+             lazy[2*ind] += lazy[ind];
+             lazy[2*ind+1] += lazy[ind];
+          }
+
+          lazy[ind] = 0;
+
+      }
+
+      void update_rnge(vector<ll>& arr,ll start,ll end,ll index,ll l,ll r,ll val){ //tc->o(logn)
+          push(index,start,end);
+
+          if(end<l || start>r){
+            return;
+          }
+
+          if(start>=l && end<=r){
+            lazy[index] += val;
+            push(index,start,end);
+            return;
+          }
+
+          ll left = 2*index;
+          ll right = 2*index+1;
+
+          ll mid = (start+end)/2;
+          update_rnge(arr,start,mid,2*index,l,r,val);
+          update_rnge(arr,mid+1,end,2*index+1,l,r,val);
+
+          tree[index] = combine(tree[left],tree[right]);
+      }
